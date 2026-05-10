@@ -1,47 +1,81 @@
-import { useState } from 'react'
-import  type { Votes, VoteType } from '../../types/votes.ts'
-import css from './App.module.css'
-import CafeInfo from "../CafeInfo/CafeInfo"
-import  VoteOptions  from "../VoteOptions/VoteOptions"
-import  VoteStats  from "../VoteStats/VoteStats"
-import  Notification  from "../Notification/Notification"
+
+import { useState } from 'react';
+
+import { fetchMovies } from '../services/movieService';
+
+import  type { Movie } from '../../types/movie.ts';
+
+import { SearchBar } from '../../components/SearchBar/SearchBar';
+
+import { MovieGrid } from '../../components/MovieGrid/MovieGrid';
+
+import  Loader  from '../../components/Loader/Loader';
+
+import { ErrorMessage } from '../../components/ErrorMessage/ErrorMessage';
+
+import { MovieModal } from '../../components/MovieModal/MovieModal';
 
 export default function App() {
 
-  
-  const [votes, setVotes] = useState<Votes>({
-    good: 0,
-    neutral: 0,
-    bad: 0
-  });
-  const handleVote = (type: VoteType) => {
-    setVotes(prevVotes => ({
-      ...prevVotes,
-      [type]: prevVotes[type] + 1
-    }));
+  const [movies, setMovies] = useState<Movie[]>([]);
+
+  const [loading, setLoading] = useState(false);
+
+  const [error, setError] = useState('');
+
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+
+  const handleSearch = async (query: string) => {
+
+    try {
+
+      setLoading(true);
+
+      setError('');
+
+      const data = await fetchMovies(query);
+
+      setMovies(data);
+
+    } catch  {
+
+      setError('Something went wrong');
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
   };
-  const resetVotes = () => {
-    setVotes({
-      good: 0,
-      neutral: 0,
-      bad: 0
-    });
-  };
-  const totalVotes = votes.good + votes.neutral + votes.bad;
-  const positiveRate = totalVotes > 0 ? Math.round((votes.good / totalVotes) * 100) : 0;
+
   return (
-    <div className={css.app}>
-      <CafeInfo />
-      <VoteOptions
-        onVote={handleVote}
-        onReset={resetVotes}
-        canReset={totalVotes > 0}
-      />
-      {totalVotes > 0 ? (
-        <VoteStats  votes={votes} totalVotes={totalVotes}  positiveRate={positiveRate} />
-      ) : (
-        <Notification   message="No votes yet. Be the first to vote!" />
+    <>
+
+      <SearchBar onSearch={handleSearch} />
+
+      {loading && <Loader />}
+
+      {error && <ErrorMessage message={error} />}
+
+      {!loading && !error && movies.length > 0 && (
+
+        <MovieGrid movies={movies} onSelect={setSelectedMovie} />
+
       )}
-    </div>
+
+      {selectedMovie && (
+
+        <MovieModal
+
+          movie={selectedMovie}
+
+          onClose={() => setSelectedMovie(null)}
+        />
+
+      )}
+
+    </>
   );
 }
+     
