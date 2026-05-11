@@ -1,16 +1,44 @@
-import { API_TOKEN, BASE_URL  } from "../api/token";
+
+import axios from 'axios';
+
 import type { Movie } from "../types/movie";
 
-export const fetchMovies = async (query: string): Promise<Movie[]> => {
-    const response = await fetch(`${BASE_URL}/search/movie?query=${query}`, {
-        headers: {
-            Authorization: `Bearer ${API_TOKEN}`,
-        },
-    }
+interface MoviesResponse {
+
+    results: Movie[];
+
+}
+
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
+const API_TOKEN = import.meta.env.VITE_API_TOKEN;
+
+export const fetchMovies = async (
+
+    query: string
+
+): Promise<Movie[]> => {
+
+    const response = await axios.get<MoviesResponse>(
+
+        `${BASE_URL}/search/movie`,
+
+        {
+
+            params: {
+                query,
+                include_adult: false,
+            },
+
+            headers: {
+
+                Authorization: `Bearer ${API_TOKEN}`,
+
+            },
+
+        }
+
     );
-    if (!response.ok) {
-        throw new Error("Failed to fetch movies");
-    }
-    const data = await response.json();
-    return data.results;
+
+    return response.data.results;
 };

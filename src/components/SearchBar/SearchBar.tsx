@@ -11,11 +11,7 @@ interface SearchBarProps {
 
 export const SearchBar = ({ onSubmit }: SearchBarProps) => {
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-
-    event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
+  const handleSubmit = (formData: FormData) => {
 
     const query = formData.get('query') as string;
 
@@ -28,14 +24,12 @@ export const SearchBar = ({ onSubmit }: SearchBarProps) => {
     }
 
     onSubmit(query);
-
-    event.currentTarget.reset();
-
+    
   };
 
   return (
 
-    <form className={styles.form} onSubmit={handleSubmit}>
+    <form className={styles.form} action={handleSubmit}>
 
       <input
 

@@ -1,50 +1,104 @@
-import { createPortal } from 'react-dom';
-
-import type { Movie } from '../../types/movie';
 
 import { useEffect } from 'react';
 
-type MovieModalProps = {
+import type { MouseEvent } from 'react';
 
-  movie: Movie;
+import type { Movie } from '../../types/movie';
 
-  onClose: () => void;
+import css from './MovieModal.module.css';
 
-};
+interface MovieModalProps {
 
-export const MovieModal = ({ movie, onClose }: MovieModalProps) => {
+    movie: Movie;
 
-  useEffect(() => {
+    onClose: () => void;
 
-    const handleEsc = (e: KeyboardEvent) => {
+}
 
-      if (e.key === 'Escape') onClose();
+export const MovieModal = ({
+
+    movie,
+
+    onClose,
+
+}: MovieModalProps) => {
+
+    useEffect(() => {
+
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+
+            document.body.style.overflow = 'auto';
+
+        };
+
+    }, []);
+
+    const handleBackdropClick = (
+
+        event: MouseEvent<HTMLDivElement>
+
+    ) => {
+
+        if (event.target === event.currentTarget) {
+
+            onClose();
+
+        }
 
     };
 
-    window.addEventListener('keydown', handleEsc);
+    return (
 
-    return () => window.removeEventListener('keydown', handleEsc);
+        <div
 
-  }, [onClose]);
+            className={css.backdrop}
 
-  return createPortal(
+            onClick={handleBackdropClick}
 
-    <div onClick={onClose}>
+        >
 
-      <div onClick={e => e.stopPropagation()}>
+            <div className={css.modal}>
 
-        <h2>{movie.title}</h2>
+                <img
 
-        <p>{movie.overview}</p>
+                    className={css.image}
 
-        <button onClick={onClose}>Close</button>
+                    src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
 
-      </div>
+                    alt={movie.title}
 
-    </div>,
+                />
 
-    document.body
+                <h2 className={css.title}>
 
-  );
-}
+                    {movie.title}
+
+                </h2>
+
+                <p>
+
+                    Release date: {movie.release_date}
+
+                </p>
+
+                <p>
+
+                    Rating: {movie.vote_average}
+
+                </p>
+
+                <p className={css.overview}>
+
+                    {movie.overview}
+
+                </p>
+
+            </div>
+
+        </div>
+
+    );
+
+};
