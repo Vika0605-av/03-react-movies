@@ -1,7 +1,14 @@
 
-import { API_TOKEN, BASE_URL } from '../../api/token';
-
 import  type { Movie } from '../../types/movie.ts';
+
+interface MovieResponse {
+
+  results: Movie[];
+
+}
+const API_TOKEN = import.meta.env.VITE_TMDB_API_KEY;
+
+const BASE_URL = import.meta.env.VITE_TMDB_BASE_URL;
 
 export const fetchMovies = async (query: string): Promise<Movie[]> => {
 
@@ -25,7 +32,7 @@ export const fetchMovies = async (query: string): Promise<Movie[]> => {
 
   }
 
-  const data = await response.json();
+  const data: MovieResponse = await response.json();
 
   return data.results;
 };

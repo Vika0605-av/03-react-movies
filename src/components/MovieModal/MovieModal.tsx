@@ -4,7 +4,7 @@ import type { Movie } from '../../types/movie';
 
 import { useEffect } from 'react';
 
-type Props = {
+type MovieModalProps = {
 
   movie: Movie;
 
@@ -12,7 +12,7 @@ type Props = {
 
 };
 
-export const MovieModal = ({ movie, onClose }: Props) => {
+export const MovieModal = ({ movie, onClose }: MovieModalProps) => {
 
   useEffect(() => {
 
