@@ -1,6 +1,8 @@
 
 import { useEffect } from 'react';
 
+import { createPortal } from 'react-dom';
+
 import type { MouseEvent } from 'react';
 
 import type { Movie } from '../../types/movie';
@@ -15,6 +17,8 @@ interface MovieModalProps {
 
 }
 
+const modalRoot = document.getElementById('modal-root') as HTMLElement;
+
 export const MovieModal = ({
 
     movie,
@@ -27,13 +31,33 @@ export const MovieModal = ({
 
         document.body.style.overflow = 'hidden';
 
+        const handleEscape = (event: KeyboardEvent) => {
+
+            if (event.key === 'Escape') {
+
+                onClose();
+
+            }
+
+        };
+
+        window.addEventListener('keydown', handleEscape);
+
         return () => {
 
             document.body.style.overflow = 'auto';
 
+            window.removeEventListener(
+
+                'keydown',
+
+                handleEscape
+
+            );
+
         };
 
-    }, []);
+    }, [onClose]);
 
     const handleBackdropClick = (
 
@@ -49,7 +73,7 @@ export const MovieModal = ({
 
     };
 
-    return (
+    return createPortal(
 
         <div
 
@@ -60,6 +84,18 @@ export const MovieModal = ({
         >
 
             <div className={css.modal}>
+
+                <button
+
+                    className={css.closeButton}
+
+                    onClick={onClose}
+
+                >
+
+                    X
+
+                </button>
 
                 <img
 
@@ -97,8 +133,10 @@ export const MovieModal = ({
 
             </div>
 
-        </div>
+        </div>,
+
+        modalRoot
 
     );
 
-};
+}
